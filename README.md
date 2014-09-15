@@ -42,7 +42,11 @@ device's actual location.
     - __callBackError__: _(Optional)_ The callback that executes if an error occurs.
 
 ### Example
-    navigator.gpslocation.getLocation(true, onSuccess, onError);
+    var highAccuracy = true; -- Need High Accuracy (Get Location over GPS each time)
+    var timeout = 60 * 1000; -- Timeout time for GPS listener
+    var max_age = 120 * 1000;-- Max age for returning same location
+
+    navigator.gpslocation.getLocation(highAccuracy, timeout, max_age, onSuccess, onError);
     
     // onSuccess Callback receives a Position object
     //
