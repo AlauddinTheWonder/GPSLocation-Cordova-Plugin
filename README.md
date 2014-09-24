@@ -20,7 +20,7 @@
 # com.alauddin.cordova.gpslocation
 
 This plugin provides information about the device's location, such as
-latitude and longitude using Global Positioning System (GPS).
+latitude and longitude using Network Provider's location or Global Positioning System (GPS).
 There is no guarantee that the plugin returns the
 device's actual location.
 
@@ -42,7 +42,7 @@ device's actual location.
     - __callBackError__: _(Optional)_ The callback that executes if an error occurs.
 
 ### Example
-    var highAccuracy = true; -- Need High Accuracy (Get Location over GPS each time)
+    var highAccuracy = true; -- If true, get location from gps, otherwise from network provider
     var timeout = 60 * 1000; -- Timeout time for GPS listener
     var max_age = 120 * 1000;-- Max age for returning same location
 
@@ -52,7 +52,13 @@ device's actual location.
     //
     var onSuccess = function(position) {
         alert("Latitude: "+ position.latitude + "\n" +
-              "Longitude: "+ position.longitude);
+              "Longitude: "+ position.longitude + "\n" +
+              "Altitude: "+ position.altitude + "\n" +
+              "Accuracy: "+ position.accuracy + "\n" +
+              "Heading: "+ position.heading + "\n" +
+              "Velocity: "+ position.velocity + "\n" +
+              "Timestamp: "+ position.timestamp
+        );
     };
 
     // onError Callback receives a PositionError object
