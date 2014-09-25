@@ -5,6 +5,8 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -23,10 +25,11 @@ public class GPSLocation extends CordovaPlugin
 	Location location;
 	String locationProvider;
 	
+	Timer timer;
 	CallbackContext callback;
 	
-	boolean statusOfGPS = false, dialogOpen = false, highAccuracy = false;
-	int timeout = 120000, max_age = 60000;
+	boolean dialogOpen = false, highAccuracy = false;
+	int timeout = 60000, max_age = 60000;
 	double latitude, longitude;
 
 	@Override
@@ -39,9 +42,9 @@ public class GPSLocation extends CordovaPlugin
 
 		if(action.equals("getLocation"))
 		{
-			highAccuracy = args.getBoolean(0);
-			timeout = args.getInt(1);
-			max_age = args.getInt(2);
+			this.highAccuracy = args.getBoolean(0);
+			this.timeout = args.getInt(1);
+			this.max_age = args.getInt(2);
 
 			this.processLocation();
 			
@@ -107,6 +110,18 @@ public class GPSLocation extends CordovaPlugin
 			}
 			else
 			{
+				if(this.timer == null) {
+		    		this.timer = new Timer();
+		    	}
+				this.timer.schedule(new TimerTask()
+				{
+					@Override
+					public void run() {
+						locationManager.removeUpdates(locationListener);
+						callback.error("Location Provider timeout");
+					}
+				}, this.timeout);
+				
 				locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
 			}
 		}
@@ -122,6 +137,7 @@ public class GPSLocation extends CordovaPlugin
 
 	private void updateLocation(Location location)
 	{
+		this.cancelTimer();
 		callback.success(this.getLocationJSON(location));
 		locationManager.removeUpdates(locationListener); // Remove the locationlistener updates once location found
 	}
@@ -198,5 +214,13 @@ public class GPSLocation extends CordovaPlugin
 		super.onPause(multitasking);
 		locationManager.removeUpdates(locationListener);
 	}
+	
+	private void cancelTimer() {
+    	if(this.timer != null) {
+    		this.timer.cancel();
+        	this.timer.purge();
+        	this.timer = null;
+    	}
+    }
 
 }
